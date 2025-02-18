@@ -6,9 +6,7 @@ jobs:
       - image: cimg/python:3.9  # Use CircleCI's Python image
     steps:
       - checkout
-      - setup_remote_docker:
-          version: 20.10.14  # Ensure Docker daemon is properly set up
-          docker_layer_caching: true  # Optional: Speeds up builds
+      
       - run:
           name: Build Docker Image
           command: docker build -t my-flask-app .
