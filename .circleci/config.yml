@@ -16,10 +16,10 @@ jobs:
             docker network create flask-network || true
             docker run -d --name flask-container --network flask-network -p 5000:5000 my-flask-app
       - run:
-          name: Debug: List Running Containers
+          name: Debug - List Running Containers
           command: docker ps -a
       - run:
-          name: Debug: Show Logs
+          name: Debug - Show Logs
           command: docker logs flask-container || true
       - run:
           name: Get Container IP and Test
