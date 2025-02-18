@@ -3,17 +3,22 @@ version: 2.1
 jobs:
   build:
     docker:
-      - image: cimg/python:3.9  # Use CircleCI's optimized Python image
+      - image: cimg/python:3.9  # CircleCI’s optimized Python image
     steps:
       - checkout
       - setup_remote_docker  # Enables Docker in CircleCI
       - run:
-          name: Build Docker image
-          command: docker build -t my-flask-app .
+          name: Debug Directory Structure
+          command: ls -R  # Prints all files/folders to confirm structure
+      - run:
+          name: Build Docker Image
+          command: docker build -t my-flask-app -f ./Dockerfile .
       - run:
           name: Run Docker Container
           command: |
-            docker run --rm my-flask-app
+            docker run --rm -p 5000:5000 my-flask-app &
+            sleep 5
+            curl -f http://localhost:5000 || exit 1
       - run:
           name: Display Success Message
           command: echo "✅ Hello, World! - Docker container ran successfully!"
