@@ -11,14 +11,12 @@ jobs:
           name: Build Docker Image
           command: docker build -t my-flask-app .
       - run:
-          name: Run Docker Container
+          name: Get Container IP and Test
           command: |
-            docker network create flask-network  # Create a network
-            docker run -d --name flask-container --network flask-network -p 5000:5000 my-flask-app
-            sleep 5
-            docker ps -a  # Debug: Show running containers
-            docker logs flask-container  # Debug: Show logs
-            curl -f http://host.docker.internal:5000 || exit 1  # Fixed
+            CONTAINER_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' flask-container)
+            echo "Flask is running on $CONTAINER_IP"
+            curl -f http://$CONTAINER_IP:5000 || exit 1
+
 
 workflows:
   version: 2
