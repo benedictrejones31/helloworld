@@ -16,5 +16,5 @@ jobs:
           name: Build Docker Image
           command: docker build -t hello-world-app ./app
       - run:
-          name: Run Docker Container
-          command: docker run -d -p 5000:5000 hello-world-app
+          name: Display Message
+          command: echo "Hello, World! - Docker image built successfully!"
