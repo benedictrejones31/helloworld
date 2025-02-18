@@ -3,27 +3,22 @@ version: 2.1
 jobs:
   build:
     docker:
-      - image: cimg/python:3.9  # CircleCI’s Python image with Docker support
+      - image: cimg/python:3.9  # CircleCI’s Python image with Docker
     steps:
       - checkout
-      - setup_remote_docker  # Enables Docker inside CircleCI
-      - run:
-          name: List Files (Debug)
-          command: ls -lah
+      - setup_remote_docker
       - run:
           name: Build Docker Image
           command: docker build -t my-flask-app .
       - run:
           name: Run Docker Container
           command: |
-            docker run -d --name flask-container -p 5000:5000 my-flask-app
+            docker network create flask-network  # Create a network
+            docker run -d --name flask-container --network flask-network -p 5000:5000 my-flask-app
             sleep 5
-            docker ps -a  # Debug: Check running containers
-            docker logs flask-container  # Debug: Show container logs
-            curl -f http://localhost:5000 || exit 1
-      - run:
-          name: Display Success Message
-          command: echo "✅ Hello, World! - Docker container ran successfully!"
+            docker ps -a  # Debug: Show running containers
+            docker logs flask-container  # Debug: Show logs
+            curl -f http://host.docker.internal:5000 || exit 1  # Fixed
 
 workflows:
   version: 2
