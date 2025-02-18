@@ -3,7 +3,7 @@ version: 2.1
 jobs:
   build:
     docker:
-      - image: cimg/python:3.9  # CircleCI’s Python image with Docker
+      - image: cimg/python:3.9
     steps:
       - checkout
       - setup_remote_docker
@@ -11,12 +11,27 @@ jobs:
           name: Build Docker Image
           command: docker build -t my-flask-app .
       - run:
+          name: Run Docker Container
+          command: |
+            docker network create flask-network || true
+            docker run -d --name flask-container --network flask-network -p 5000:5000 my-flask-app
+      - run:
+          name: Debug: List Running Containers
+          command: docker ps -a
+      - run:
+          name: Debug: Show Logs
+          command: docker logs flask-container || true
+      - run:
           name: Get Container IP and Test
           command: |
+            CONTAINER_ID=$(docker ps -aqf "name=flask-container")
+            if [ -z "$CONTAINER_ID" ]; then
+              echo "ERROR: No container found!"
+              exit 1
+            fi
             CONTAINER_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' flask-container)
             echo "Flask is running on $CONTAINER_IP"
             curl -f http://$CONTAINER_IP:5000 || exit 1
-
 
 workflows:
   version: 2
